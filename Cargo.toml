@@ -1,0 +1,11 @@
+[package]
+name = "stellare-types"
+version = "0.1.0"
+edition = "2024"
+authors = ["Kiri Wysteria <kiriwysteria@gmail.com>"]
+repository = "https://github.com/kiri-wys/stellare-types"
+description = "Common types for the Stellare ecosystem"
+license = "MIT"
+keywords = ["gamedev"]
+
+[dependencies]
