@@ -18,17 +18,44 @@ where
     pub y: S,
     _phantom: PhantomData<(D, U)>,
 }
+impl<D, S, U> Vector2<D, S, U>
+where
+    D: Decimal,
+    S: Scalar<D>,
+    U: Unit,
+{
+    pub fn new<V: Unit>(x: S, y: S) -> Vector2<D, S, V> {
+        Vector2 {
+            x,
+            y,
+            _phantom: PhantomData,
+        }
+    }
+}
 
-pub trait ScalarVector2Impl {}
-impl ScalarVector2Impl for f32 {}
 impl<D, S, U> Vector<D, S> for Vector2<D, S, U>
 where
     D: Decimal,
-    S: Scalar<D> + ScalarVector2Impl,
+    S: Scalar<D>,
     U: Unit,
 {
     type Precise = Vector2<D, D, U>;
     type Normalized = Option<NormalizedVector2<D, U>>;
+
+    fn zero() -> Self {
+        Self {
+            x: S::zero(),
+            y: S::zero(),
+            _phantom: PhantomData,
+        }
+    }
+    fn one() -> Self {
+        Self {
+            x: S::one(),
+            y: S::one(),
+            _phantom: PhantomData,
+        }
+    }
 
     fn to_precise(self) -> Self::Precise {
         Vector2 {

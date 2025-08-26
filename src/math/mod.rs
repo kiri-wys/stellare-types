@@ -1,4 +1,5 @@
 pub mod angles;
+pub mod rect;
 pub mod vec2;
 
 use core::{f32, f64};
@@ -10,8 +11,6 @@ pub use crate::math::{
 };
 
 pub trait Decimal: Clone + Copy + Scalar<Self> {
-    fn zero() -> Self;
-    fn one() -> Self;
     fn pi() -> Self;
     fn tau() -> Self;
     fn to_radians(self) -> Self;
@@ -26,12 +25,6 @@ pub trait Decimal: Clone + Copy + Scalar<Self> {
     fn can_div_safe(self) -> bool;
 }
 impl Decimal for f32 {
-    fn zero() -> Self {
-        0.0
-    }
-    fn one() -> Self {
-        1.0
-    }
     fn pi() -> Self {
         f32::consts::PI
     }
@@ -66,12 +59,6 @@ impl Decimal for f32 {
     }
 }
 impl Decimal for f64 {
-    fn zero() -> Self {
-        0.0
-    }
-    fn one() -> Self {
-        1.0
-    }
     fn pi() -> Self {
         f64::consts::PI
     }
@@ -115,6 +102,9 @@ pub trait Scalar<D: Decimal>:
     + Div<Output = Self>
     + PartialOrd
 {
+    fn zero() -> Self;
+    fn one() -> Self;
+
     fn to_precise(self) -> D;
 
     fn min(self, other: Self) -> Self {
@@ -135,11 +125,23 @@ pub trait Scalar<D: Decimal>:
 }
 
 impl Scalar<f32> for f32 {
+    fn zero() -> Self {
+        0.0
+    }
+    fn one() -> Self {
+        1.0
+    }
     fn to_precise(self) -> f32 {
         self
     }
 }
 impl Scalar<f64> for f64 {
+    fn zero() -> Self {
+        0.0
+    }
+    fn one() -> Self {
+        1.0
+    }
     fn to_precise(self) -> f64 {
         self
     }
@@ -154,6 +156,9 @@ where
 {
     type Precise;
     type Normalized;
+
+    fn zero() -> Self;
+    fn one() -> Self;
 
     fn to_precise(self) -> Self::Precise;
 
