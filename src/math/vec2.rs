@@ -3,9 +3,7 @@ use std::{
     ops::{Add, Div, Mul, Sub},
 };
 
-use crate::math::{
-    Angle, Decimal, NormalizedVector2, Radians, Scalar, Unit, Vector, angles::AngleConversions as _,
-};
+use crate::math::{Angle, Decimal, NormalizedVector2, Scalar, Unit, Vector};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Vector2<D, S, U = ()>
@@ -90,8 +88,11 @@ where
         (self - other).length_squared()
     }
 
-    fn rotate(self, angle: Angle<D, Radians>) -> Self::Precise {
-        let rads = angle.num_radians();
+    fn rotate<A>(self, angle: A) -> Self::Precise
+    where
+        A: Angle<D>,
+    {
+        let rads = angle.radians();
         let p = self.to_precise();
         Vector2 {
             x: p.x * rads.cos() - p.y * rads.sin(),

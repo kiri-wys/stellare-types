@@ -1,16 +1,18 @@
 pub mod angles;
 pub mod rect;
+pub mod transform2;
 pub mod vec2;
 
 use core::{f32, f64};
-use std::ops::{Add, Div, Mul, Sub};
+use std::ops::{Add, Div, Mul, Neg, Sub};
 
 pub use crate::math::{
     angles::{Angle, Degrees, Radians},
+    transform2::Affine2D,
     vec2::Vector2,
 };
 
-pub trait Decimal: Clone + Copy + Scalar<Self> {
+pub trait Decimal: Clone + Copy + Scalar<Self> + Neg<Output = Self> {
     fn pi() -> Self;
     fn tau() -> Self;
     fn to_radians(self) -> Self;
@@ -19,6 +21,7 @@ pub trait Decimal: Clone + Copy + Scalar<Self> {
     fn sqrt(&self) -> Self;
     fn cos(self) -> Self;
     fn sin(self) -> Self;
+    fn sin_cos(self) -> (Self, Self);
     fn atan2(self, other: Self) -> Self;
 
     fn is_number(self) -> bool;
@@ -46,6 +49,9 @@ impl Decimal for f32 {
     }
     fn sin(self) -> Self {
         f32::sin(self)
+    }
+    fn sin_cos(self) -> (Self, Self) {
+        self.sin_cos()
     }
     fn atan2(self, other: Self) -> Self {
         self.atan2(other)
@@ -80,6 +86,9 @@ impl Decimal for f64 {
     }
     fn sin(self) -> Self {
         f64::sin(self)
+    }
+    fn sin_cos(self) -> (Self, Self) {
+        (self.sin(), self.cos())
     }
     fn atan2(self, other: Self) -> Self {
         self.atan2(other)
@@ -169,7 +178,7 @@ where
     fn distance_to(self, other: Self) -> D;
     fn distance_to_squared(self, other: Self) -> S;
 
-    fn rotate(self, angle: Angle<D, Radians>) -> Self::Precise;
+    fn rotate<A: Angle<D>>(self, angle: A) -> Self::Precise;
     fn lerp(self, max: Self, alpha: D) -> Self::Precise;
     fn min(self, other: Self) -> Self;
     fn max(self, other: Self) -> Self;
