@@ -24,7 +24,7 @@ where
     S: Scalar<D>,
     U: Unit,
 {
-    pub fn new<V: Unit>(x: S, y: S) -> Vector2<D, S, V> {
+    pub fn new(x: S, y: S) -> Vector2<D, S, U> {
         Vector2 {
             x,
             y,
@@ -66,7 +66,7 @@ where
     }
 
     fn dot(self, other: Self) -> S {
-        self.x * other.x + self.y + other.y
+        self.x * other.x + self.y * other.y
     }
     fn length_squared(self) -> S {
         self.x * self.x + self.y * self.y
