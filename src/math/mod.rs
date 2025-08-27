@@ -8,7 +8,8 @@ use std::ops::{Add, Div, Mul, Neg, Sub};
 
 pub use crate::math::{
     angles::{Angle, Degrees, Radians},
-    transform2::Affine2D,
+    rect::Rect2,
+    transform2::Affine2,
     vec2::Vector2,
 };
 
@@ -158,6 +159,13 @@ impl Scalar<f64> for f64 {
 
 pub trait Unit: Clone + Copy {}
 impl Unit for () {}
+#[derive(Debug, Clone, Copy)]
+pub struct WorldSpace;
+#[derive(Debug, Clone, Copy)]
+pub struct TexelSpace;
+impl Unit for WorldSpace {}
+impl Unit for TexelSpace {}
+
 pub trait Vector<D, S>
 where
     D: Decimal,

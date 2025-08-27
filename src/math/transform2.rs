@@ -4,7 +4,7 @@ use crate::math::{Angle, Decimal, Unit, Vector2};
 
 #[derive(Debug, Clone, Copy)]
 #[rustfmt::skip]
-pub struct Affine2D<D, U = ()>
+pub struct Affine2<D, U = ()>
 where
     D: Decimal,
     U: Unit,
@@ -15,7 +15,7 @@ where
     _phantom: PhantomData<U>,
 }
 
-impl<D, U> Affine2D<D, U>
+impl<D, U> Affine2<D, U>
 where
     D: Decimal,
     U: Unit,
@@ -53,7 +53,7 @@ where
         Self::from_scale(Vector2::new(scale, scale))
     }
 }
-impl<D, U> Mul for Affine2D<D, U>
+impl<D, U> Mul for Affine2<D, U>
 where
     D: Decimal,
     U: Unit,
@@ -72,12 +72,12 @@ where
         }
     }
 }
-impl<D, U> From<Affine2D<D, U>> for [[D; 2]; 3]
+impl<D, U> From<Affine2<D, U>> for [[D; 2]; 3]
 where
     D: Decimal,
     U: Unit,
 {
-    fn from(value: Affine2D<D, U>) -> Self {
+    fn from(value: Affine2<D, U>) -> Self {
         [
             [value.m00, value.m01],
             [value.m10, value.m11],

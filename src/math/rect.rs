@@ -2,7 +2,7 @@ use std::marker::PhantomData;
 
 use crate::math::{Decimal, Scalar, Unit, Vector, Vector2};
 
-pub struct Rect2D<D, S, U = ()>
+pub struct Rect2<D, S, U = ()>
 where
     D: Decimal,
     S: Scalar<D>,
@@ -10,9 +10,9 @@ where
 {
     pub min: Vector2<D, S, U>,
     pub max: Vector2<D, S, U>,
-    _phantom: PhantomData<()>,
+    _phantom: PhantomData<U>,
 }
-impl<D, S, U> Rect2D<D, S, U>
+impl<D, S, U> Rect2<D, S, U>
 where
     D: Decimal,
     S: Scalar<D>,
