@@ -13,7 +13,7 @@ pub use crate::math::{
     vec2::{Vector2, Vector2d, Vector2f, Vector2i, Vector2u},
 };
 
-pub trait Decimal: Clone + Copy + Scalar<Self> + Neg<Output = Self> {
+pub trait Decimal: Clone + Copy + Scalar<Decimal = Self> + Neg<Output = Self> {
     fn pi() -> Self;
     fn tau() -> Self;
     fn to_radians(self) -> Self;
@@ -103,7 +103,7 @@ impl Decimal for f64 {
     }
 }
 
-pub trait Scalar<D: Decimal>:
+pub trait Scalar:
     Clone
     + Copy
     + Add<Output = Self>
@@ -112,10 +112,12 @@ pub trait Scalar<D: Decimal>:
     + Div<Output = Self>
     + PartialOrd
 {
+    type Decimal: Decimal;
+
     fn zero() -> Self;
     fn one() -> Self;
 
-    fn to_precise(self) -> D;
+    fn to_precise(self) -> Self::Decimal;
 
     fn min(self, other: Self) -> Self {
         if self > other { other } else { self }
@@ -134,7 +136,8 @@ pub trait Scalar<D: Decimal>:
     }
 }
 
-impl Scalar<f32> for f32 {
+impl Scalar for f32 {
+    type Decimal = Self;
     fn zero() -> Self {
         0.0
     }
@@ -145,7 +148,8 @@ impl Scalar<f32> for f32 {
         self
     }
 }
-impl Scalar<f64> for f64 {
+impl Scalar for f64 {
+    type Decimal = Self;
     fn zero() -> Self {
         0.0
     }
@@ -160,7 +164,8 @@ impl Scalar<f64> for f64 {
 macro_rules! impl_scalar_for_ints {
     ($($t:ty),*) => {
         $(
-            impl Scalar<f32> for $t {
+            impl Scalar for $t {
+                type Decimal = f32;
                 fn zero() -> Self {
                     0
                 }
@@ -179,7 +184,8 @@ impl_scalar_for_ints!(u8, i8, u16, i16, u32, i32);
 macro_rules! impl_scalar_for_64 {
     ($($t:ty),*) => {
         $(
-            impl Scalar<f64> for $t {
+            impl Scalar for $t {
+                type Decimal = f64;
                 fn zero() -> Self {
                     0
                 }
@@ -209,10 +215,9 @@ macro_rules! define_spaces {
 }
 define_spaces!(WorldSpace, ViewSpace, ClipSpace, TexelSpace, ScreenSpace);
 
-pub trait Vector<D, S>
+pub trait Vector<S>
 where
-    D: Decimal,
-    S: Scalar<D>,
+    S: Scalar,
 {
     type Precise;
     type Normalized;
@@ -224,13 +229,13 @@ where
 
     fn dot(self, other: Self) -> S;
     fn length_squared(self) -> S;
-    fn length(self) -> D;
+    fn length(self) -> S::Decimal;
     fn normalize(self) -> Self::Normalized;
-    fn distance_to(self, other: Self) -> D;
+    fn distance_to(self, other: Self) -> S::Decimal;
     fn distance_to_squared(self, other: Self) -> S;
 
-    fn rotate<A: Angle<D>>(self, angle: A) -> Self::Precise;
-    fn lerp(self, max: Self, alpha: D) -> Self::Precise;
+    fn rotate<A: Angle<S::Decimal>>(self, angle: A) -> Self::Precise;
+    fn lerp(self, max: Self, alpha: S::Decimal) -> Self::Precise;
     fn min(self, other: Self) -> Self;
     fn max(self, other: Self) -> Self;
     fn clamp(self, min: Self, max: Self) -> Self;
@@ -243,7 +248,7 @@ where
     {
         self.length_squared()
     }
-    fn magnitude(self) -> D
+    fn magnitude(self) -> S::Decimal
     where
         Self: Sized,
     {
@@ -254,17 +259,17 @@ where
 #[repr(transparent)]
 pub struct NormalizedVector2<D, U = ()>
 where
-    D: Decimal + Scalar<D>,
+    D: Decimal + Scalar,
     U: Unit,
 {
-    data: Vector2<D, D, U>,
+    data: Vector2<D, U>,
 }
 impl<D, U> NormalizedVector2<D, U>
 where
     D: Decimal,
     U: Unit,
 {
-    pub fn vector(self) -> Vector2<D, D, U> {
+    pub fn vector(self) -> Vector2<D, U> {
         self.data
     }
 }

@@ -34,7 +34,7 @@ where
         }
     }
     #[rustfmt::skip]
-    pub fn from_translation(translation: Vector2<D, D, T>) -> Self {
+    pub fn from_translation(translation: Vector2<D, T>) -> Self {
         Self {
             m00: D::one(), m01: D::zero(),
             m10: D::zero(), m11: D::one(),
@@ -57,7 +57,7 @@ where
         Self::from_nonuniform_scale(Vector2::new(scale, scale))
     }
     #[rustfmt::skip]
-    pub fn from_nonuniform_scale(scale: Vector2<D, D, T>) -> Self {
+    pub fn from_nonuniform_scale(scale: Vector2<D, T>) -> Self {
         Self {
             m00: scale.x, m01: D::zero(),
             m10: D::zero(), m11: scale.y,
@@ -71,7 +71,7 @@ where
     D: Decimal,
 {
     pub fn from_camera<A>(
-        position: Vector2<D, D, WorldSpace>,
+        position: Vector2<D, WorldSpace>,
         rotation: A,
         zoom: D,
     ) -> Affine2<D, WorldSpace, ViewSpace>

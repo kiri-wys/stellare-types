@@ -5,29 +5,27 @@ use std::{
 
 use crate::math::{Angle, Decimal, NormalizedVector2, Scalar, Unit, Vector};
 
-pub type Vector2u<U> = Vector2<f32, u32, U>;
-pub type Vector2i<U> = Vector2<f32, i32, U>;
-pub type Vector2f<U> = Vector2<f32, f32, U>;
-pub type Vector2d<U> = Vector2<f64, i64, U>;
+pub type Vector2u<U> = Vector2<u32, U>;
+pub type Vector2i<U> = Vector2<i32, U>;
+pub type Vector2f<U> = Vector2<f32, U>;
+pub type Vector2d<U> = Vector2<i64, U>;
 
 #[derive(Debug, Default, Clone, Copy)]
-pub struct Vector2<D, S, U = ()>
+pub struct Vector2<S, U = ()>
 where
-    D: Decimal,
-    S: Scalar<D>,
+    S: Scalar,
     U: Unit,
 {
     pub x: S,
     pub y: S,
-    _phantom: PhantomData<(D, U)>,
+    _phantom: PhantomData<U>,
 }
-impl<D, S, U> Vector2<D, S, U>
+impl<S, U> Vector2<S, U>
 where
-    D: Decimal,
-    S: Scalar<D>,
+    S: Scalar,
     U: Unit,
 {
-    pub fn new(x: S, y: S) -> Vector2<D, S, U> {
+    pub fn new(x: S, y: S) -> Vector2<S, U> {
         Vector2 {
             x,
             y,
@@ -36,14 +34,13 @@ where
     }
 }
 
-impl<D, S, U> Vector<D, S> for Vector2<D, S, U>
+impl<S, U> Vector<S> for Vector2<S, U>
 where
-    D: Decimal,
-    S: Scalar<D>,
+    S: Scalar,
     U: Unit,
 {
-    type Precise = Vector2<D, D, U>;
-    type Normalized = Option<NormalizedVector2<D, U>>;
+    type Precise = Vector2<S::Decimal, U>;
+    type Normalized = Option<NormalizedVector2<S::Decimal, U>>;
 
     fn zero() -> Self {
         Self {
@@ -74,7 +71,7 @@ where
     fn length_squared(self) -> S {
         self.x * self.x + self.y * self.y
     }
-    fn length(self) -> D {
+    fn length(self) -> S::Decimal {
         self.length_squared().to_precise().sqrt()
     }
     fn normalize(self) -> Self::Normalized {
@@ -86,7 +83,7 @@ where
         }
         Some(NormalizedVector2 { data: (p / l) })
     }
-    fn distance_to(self, other: Self) -> D {
+    fn distance_to(self, other: Self) -> S::Decimal {
         (self - other).length()
     }
     fn distance_to_squared(self, other: Self) -> S {
@@ -95,7 +92,7 @@ where
 
     fn rotate<A>(self, angle: A) -> Self::Precise
     where
-        A: Angle<D>,
+        A: Angle<S::Decimal>,
     {
         let rads = angle.radians();
         let p = self.to_precise();
@@ -105,12 +102,12 @@ where
             _phantom: PhantomData,
         }
     }
-    fn lerp(self, max: Self, alpha: D) -> Self::Precise {
+    fn lerp(self, max: Self, alpha: S::Decimal) -> Self::Precise {
         let p_min = self.to_precise();
         let p_max = max.to_precise();
         Vector2 {
-            x: p_min.x * (D::one() - alpha) + p_max.x * alpha,
-            y: p_min.y * (D::one() - alpha) + p_max.y * alpha,
+            x: p_min.x * (S::Decimal::one() - alpha) + p_max.x * alpha,
+            y: p_min.y * (S::Decimal::one() - alpha) + p_max.y * alpha,
             _phantom: PhantomData,
         }
     }
@@ -151,15 +148,14 @@ where
     }
 }
 
-impl<D, S, U> Add<Vector2<D, S, U>> for Vector2<D, S, U>
+impl<S, U> Add<Vector2<S, U>> for Vector2<S, U>
 where
-    D: Decimal,
-    S: Scalar<D>,
+    S: Scalar,
     U: Unit,
 {
     type Output = Self;
 
-    fn add(self, rhs: Vector2<D, S, U>) -> Self::Output {
+    fn add(self, rhs: Vector2<S, U>) -> Self::Output {
         Self {
             x: self.x + rhs.x,
             y: self.y + rhs.y,
@@ -167,15 +163,14 @@ where
         }
     }
 }
-impl<D, S, U> Sub<Vector2<D, S, U>> for Vector2<D, S, U>
+impl<S, U> Sub<Vector2<S, U>> for Vector2<S, U>
 where
-    D: Decimal,
-    S: Scalar<D>,
+    S: Scalar,
     U: Unit,
 {
     type Output = Self;
 
-    fn sub(self, rhs: Vector2<D, S, U>) -> Self::Output {
+    fn sub(self, rhs: Vector2<S, U>) -> Self::Output {
         Self {
             x: self.x - rhs.x,
             y: self.y - rhs.y,
@@ -184,10 +179,9 @@ where
     }
 }
 
-impl<D, S, U> Mul<S> for Vector2<D, S, U>
+impl<S, U> Mul<S> for Vector2<S, U>
 where
-    D: Decimal,
-    S: Scalar<D>,
+    S: Scalar,
     U: Unit,
 {
     type Output = Self;
@@ -200,10 +194,9 @@ where
         }
     }
 }
-impl<D, S, U> Div<S> for Vector2<D, S, U>
+impl<S, U> Div<S> for Vector2<S, U>
 where
-    D: Decimal,
-    S: Scalar<D>,
+    S: Scalar,
     U: Unit,
 {
     type Output = Self;
@@ -220,7 +213,7 @@ where
 macro_rules! impl_neg_for_signed {
     ($($t:ty),*) => {
         $(
-            impl<U> Neg for Vector2<f32, $t, U>
+            impl<U> Neg for Vector2<$t, U>
             where
                 U: Unit,
             {
@@ -237,26 +230,4 @@ macro_rules! impl_neg_for_signed {
         )*
     };
 }
-impl_neg_for_signed!(i8, i16, i32, f32);
-
-macro_rules! impl_neg_for_64{
-    ($($t:ty),*) => {
-        $(
-            impl<U> Neg for Vector2<f64, $t, U>
-            where
-                U: Unit,
-            {
-                type Output = Self;
-
-                fn neg(self) -> Self::Output {
-                    Self {
-                        x: -self.x,
-                        y: -self.y,
-                        _phantom: PhantomData,
-                    }
-                }
-            }
-        )*
-    };
-}
-impl_neg_for_64!(i64, f64);
+impl_neg_for_signed!(i8, i16, i32, i64, f32, f64);
