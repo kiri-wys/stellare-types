@@ -8,9 +8,9 @@ use std::ops::{Add, Div, Mul, Neg, Sub};
 
 pub use crate::math::{
     angles::{Angle, Degrees, Radians},
-    rect::Rect2,
+    rect::{Rect2, Rect2d, Rect2f, Rect2i, Rect2u},
     transform2::Affine2,
-    vec2::Vector2,
+    vec2::{Vector2, Vector2d, Vector2f, Vector2i, Vector2u},
 };
 
 pub trait Decimal: Clone + Copy + Scalar<Self> + Neg<Output = Self> {
@@ -157,14 +157,57 @@ impl Scalar<f64> for f64 {
     }
 }
 
+macro_rules! impl_scalar_for_ints {
+    ($($t:ty),*) => {
+        $(
+            impl Scalar<f32> for $t {
+                fn zero() -> Self {
+                    0
+                }
+                fn one() -> Self {
+                    1
+                }
+                fn to_precise(self) -> f32 {
+                    self as f32
+                }
+            }
+        )*
+    };
+}
+
+impl_scalar_for_ints!(u8, i8, u16, i16, u32, i32);
+macro_rules! impl_scalar_for_64 {
+    ($($t:ty),*) => {
+        $(
+            impl Scalar<f64> for $t {
+                fn zero() -> Self {
+                    0
+                }
+                fn one() -> Self {
+                    1
+                }
+                fn to_precise(self) -> f64 {
+                    self as f64
+                }
+            }
+        )*
+    };
+}
+impl_scalar_for_64!(i64, u64);
+
 pub trait Unit: Clone + Copy {}
 impl Unit for () {}
-#[derive(Debug, Clone, Copy)]
-pub struct WorldSpace;
-#[derive(Debug, Clone, Copy)]
-pub struct TexelSpace;
-impl Unit for WorldSpace {}
-impl Unit for TexelSpace {}
+
+macro_rules! define_spaces {
+    ($($name:ident),* $(,)?) => {
+        $(
+            #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+            pub struct $name;
+            impl Unit for $name {}
+        )*
+    };
+}
+define_spaces!(WorldSpace, ViewSpace, ClipSpace, TexelSpace, ScreenSpace);
 
 pub trait Vector<D, S>
 where

@@ -1,11 +1,16 @@
 use std::{
     marker::PhantomData,
-    ops::{Add, Div, Mul, Sub},
+    ops::{Add, Div, Mul, Neg, Sub},
 };
 
 use crate::math::{Angle, Decimal, NormalizedVector2, Scalar, Unit, Vector};
 
-#[derive(Debug, Clone, Copy)]
+pub type Vector2u<U> = Vector2<f32, u32, U>;
+pub type Vector2i<U> = Vector2<f32, i32, U>;
+pub type Vector2f<U> = Vector2<f32, f32, U>;
+pub type Vector2d<U> = Vector2<f64, i64, U>;
+
+#[derive(Debug, Default, Clone, Copy)]
 pub struct Vector2<D, S, U = ()>
 where
     D: Decimal,
@@ -211,3 +216,47 @@ where
         }
     }
 }
+
+macro_rules! impl_neg_for_signed {
+    ($($t:ty),*) => {
+        $(
+            impl<U> Neg for Vector2<f32, $t, U>
+            where
+                U: Unit,
+            {
+                type Output = Self;
+
+                fn neg(self) -> Self::Output {
+                    Self {
+                        x: -self.x,
+                        y: -self.y,
+                        _phantom: PhantomData,
+                    }
+                }
+            }
+        )*
+    };
+}
+impl_neg_for_signed!(i8, i16, i32, f32);
+
+macro_rules! impl_neg_for_64{
+    ($($t:ty),*) => {
+        $(
+            impl<U> Neg for Vector2<f64, $t, U>
+            where
+                U: Unit,
+            {
+                type Output = Self;
+
+                fn neg(self) -> Self::Output {
+                    Self {
+                        x: -self.x,
+                        y: -self.y,
+                        _phantom: PhantomData,
+                    }
+                }
+            }
+        )*
+    };
+}
+impl_neg_for_64!(i64, f64);
