@@ -1,9 +1,8 @@
-use std::{
-    marker::PhantomData,
-    ops::{Div, Mul},
-};
+use std::marker::PhantomData;
 
-use crate::math::{Decimal, Scalar, Unit, Vector, Vector2};
+use stellare_types_derive::{BcArithmetic, BcBitops, CwArithmetic, CwBitops};
+
+use crate::math::{Scalar, Unit, Vector, Vector2};
 
 pub type Rect2u<U> = Rect2<u32, U>;
 pub type Rect2i<U> = Rect2<i32, U>;
@@ -67,7 +66,7 @@ where
     }
 }
 
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, CwArithmetic, CwBitops, BcArithmetic, BcBitops)]
 pub struct CornerData<S>
 where
     S: Scalar,
@@ -98,37 +97,6 @@ where
         self.bottom_left = self.bottom_left.clamp(min, max);
         self.bottom_right = self.bottom_right.clamp(min, max);
         self.top_right = self.top_right.clamp(min, max);
-    }
-}
-impl<S> Mul<S> for CornerData<S>
-where
-    S: Scalar,
-{
-    type Output = Self;
-
-    fn mul(self, rhs: S) -> Self::Output {
-        Self::Output {
-            top_left: self.top_left * rhs,
-            bottom_left: self.bottom_left * rhs,
-            bottom_right: self.bottom_right * rhs,
-            top_right: self.top_right * rhs,
-        }
-    }
-}
-
-impl<S> Div<S> for CornerData<S>
-where
-    S: Scalar,
-{
-    type Output = Self;
-
-    fn div(self, rhs: S) -> Self::Output {
-        Self::Output {
-            top_left: self.top_left / rhs,
-            bottom_left: self.bottom_left / rhs,
-            bottom_right: self.bottom_right / rhs,
-            top_right: self.top_right / rhs,
-        }
     }
 }
 

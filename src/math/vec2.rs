@@ -1,7 +1,6 @@
-use std::{
-    marker::PhantomData,
-    ops::{Add, Div, Mul, Neg, Sub},
-};
+use std::{marker::PhantomData, ops::Neg};
+
+use stellare_types_derive::{BcArithmetic, BcBitops, CwArithmetic, CwBitops};
 
 use crate::math::{Angle, Decimal, NormalizedVector2, Scalar, Unit, Vector};
 
@@ -10,7 +9,7 @@ pub type Vector2i<U> = Vector2<i32, U>;
 pub type Vector2f<U> = Vector2<f32, U>;
 pub type Vector2d<U> = Vector2<i64, U>;
 
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, CwArithmetic, CwBitops, BcArithmetic, BcBitops)]
 pub struct Vector2<S, U = ()>
 where
     S: Scalar,
@@ -18,6 +17,7 @@ where
 {
     pub x: S,
     pub y: S,
+    #[op_override("PhantomData")]
     _phantom: PhantomData<U>,
 }
 impl<S, U> Vector2<S, U>
@@ -144,68 +144,6 @@ where
             (0, self.x)
         } else {
             (1, self.y)
-        }
-    }
-}
-
-impl<S, U> Add<Vector2<S, U>> for Vector2<S, U>
-where
-    S: Scalar,
-    U: Unit,
-{
-    type Output = Self;
-
-    fn add(self, rhs: Vector2<S, U>) -> Self::Output {
-        Self {
-            x: self.x + rhs.x,
-            y: self.y + rhs.y,
-            _phantom: PhantomData,
-        }
-    }
-}
-impl<S, U> Sub<Vector2<S, U>> for Vector2<S, U>
-where
-    S: Scalar,
-    U: Unit,
-{
-    type Output = Self;
-
-    fn sub(self, rhs: Vector2<S, U>) -> Self::Output {
-        Self {
-            x: self.x - rhs.x,
-            y: self.y - rhs.y,
-            _phantom: PhantomData,
-        }
-    }
-}
-
-impl<S, U> Mul<S> for Vector2<S, U>
-where
-    S: Scalar,
-    U: Unit,
-{
-    type Output = Self;
-
-    fn mul(self, rhs: S) -> Self::Output {
-        Self {
-            x: self.x * rhs,
-            y: self.y * rhs,
-            _phantom: PhantomData,
-        }
-    }
-}
-impl<S, U> Div<S> for Vector2<S, U>
-where
-    S: Scalar,
-    U: Unit,
-{
-    type Output = Self;
-
-    fn div(self, rhs: S) -> Self::Output {
-        Self {
-            x: self.x / rhs,
-            y: self.y / rhs,
-            _phantom: PhantomData,
         }
     }
 }

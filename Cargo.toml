@@ -10,8 +10,12 @@ keywords = ["gamedev"]
 
 [dependencies]
 palette = { version = "0.7.6", optional = true }
+stellare-types-derive = { version = "0.0.3", path = "derive" }
 
 [features]
 math = []
 color = [ "dep:palette" ]
 default = [ "math", "color"]
+
+[workspace]
+members = [ "derive" ]

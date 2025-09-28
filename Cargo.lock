@@ -148,6 +148,16 @@ name = "stellare-types"
 version = "0.0.3"
 dependencies = [
  "palette",
+ "stellare-types-derive",
+]
+
+[[package]]
+name = "stellare-types-derive"
+version = "0.0.3"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]

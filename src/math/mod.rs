@@ -4,7 +4,7 @@ pub mod transform2;
 pub mod vec2;
 
 use core::{f32, f64};
-use std::ops::{Add, Div, Mul, Neg, Sub};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 pub use crate::math::{
     angles::{Angle, Degrees, Radians},
@@ -110,6 +110,10 @@ pub trait Scalar:
     + Sub<Output = Self>
     + Mul<Output = Self>
     + Div<Output = Self>
+    + AddAssign
+    + SubAssign
+    + MulAssign
+    + DivAssign
     + PartialOrd
 {
     type Decimal: Decimal;
