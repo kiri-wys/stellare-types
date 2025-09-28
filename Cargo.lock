@@ -145,7 +145,7 @@ checksum = "56199f7ddabf13fe5074ce809e7d3f42b42ae711800501b5b16ea82ad029c39d"
 
 [[package]]
 name = "stellare-types"
-version = "0.0.3"
+version = "0.0.4"
 dependencies = [
  "palette",
  "stellare-types-derive",
@@ -153,7 +153,7 @@ dependencies = [
 
 [[package]]
 name = "stellare-types-derive"
-version = "0.0.3"
+version = "0.0.4"
 dependencies = [
  "proc-macro2",
  "quote",

@@ -56,6 +56,9 @@ where
             _phantom: PhantomData,
         }
     }
+    fn splat(val: S) -> Self {
+        Self::new(val, val)
+    }
 
     fn to_precise(self) -> Self::Precise {
         Vector2 {

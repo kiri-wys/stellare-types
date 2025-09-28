@@ -120,6 +120,7 @@ pub trait Scalar:
 
     fn zero() -> Self;
     fn one() -> Self;
+    fn splat<V: Vector<Self>>(self) -> V;
 
     fn to_precise(self) -> Self::Decimal;
 
@@ -148,6 +149,9 @@ impl Scalar for f32 {
     fn one() -> Self {
         1.0
     }
+    fn splat<V: Vector<Self>>(self) -> V {
+        V::splat(self)
+    }
     fn to_precise(self) -> f32 {
         self
     }
@@ -159,6 +163,9 @@ impl Scalar for f64 {
     }
     fn one() -> Self {
         1.0
+    }
+    fn splat<V: Vector<Self>>(self) -> V {
+        V::splat(self)
     }
     fn to_precise(self) -> f64 {
         self
@@ -175,6 +182,9 @@ macro_rules! impl_scalar_for_ints {
                 }
                 fn one() -> Self {
                     1
+                }
+                fn splat<V: Vector<Self>>(self) -> V {
+                    V::splat(self)
                 }
                 fn to_precise(self) -> f32 {
                     self as f32
@@ -195,6 +205,9 @@ macro_rules! impl_scalar_for_64 {
                 }
                 fn one() -> Self {
                     1
+                }
+                fn splat<V: Vector<Self>>(self) -> V {
+                    V::splat(self)
                 }
                 fn to_precise(self) -> f64 {
                     self as f64
@@ -228,6 +241,7 @@ where
 
     fn zero() -> Self;
     fn one() -> Self;
+    fn splat(val: S) -> Self;
 
     fn to_precise(self) -> Self::Precise;
 
