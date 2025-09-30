@@ -172,3 +172,23 @@ macro_rules! impl_neg_for_signed {
     };
 }
 impl_neg_for_signed!(i8, i16, i32, i64, f32, f64);
+
+impl<S, U> From<Vector2<S, U>> for (S, S)
+where
+    S: Scalar,
+    U: Unit,
+{
+    fn from(value: Vector2<S, U>) -> Self {
+        (value.x, value.y)
+    }
+}
+
+impl<S, U> From<(S, S)> for Vector2<S, U>
+where
+    S: Scalar,
+    U: Unit,
+{
+    fn from(value: (S, S)) -> Self {
+        Vector2::new(value.0, value.1)
+    }
+}
