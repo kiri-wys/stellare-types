@@ -7,7 +7,7 @@ use crate::math::{Angle, Decimal, NormalizedVector2, Scalar, Unit, Vector};
 pub type Vector2u<U> = Vector2<u32, U>;
 pub type Vector2i<U> = Vector2<i32, U>;
 pub type Vector2f<U> = Vector2<f32, U>;
-pub type Vector2d<U> = Vector2<i64, U>;
+pub type Vector2d<U> = Vector2<f64, U>;
 
 #[derive(Debug, Default, Clone, Copy, CwArithmetic, CwBitops, BcArithmetic, BcBitops)]
 pub struct Vector2<S, U = ()>
