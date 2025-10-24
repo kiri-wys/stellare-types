@@ -24,6 +24,13 @@ where
     S: Scalar,
     U: Unit,
 {
+    pub fn empty() -> Self {
+        Self {
+            min: Vector2::new(S::max_value(), S::max_value()),
+            max: Vector2::new(S::min_value(), S::min_value()),
+            _phantom: PhantomData,
+        }
+    }
     pub fn new(mut min: Vector2<S, U>, mut max: Vector2<S, U>) -> Self {
         if min.x > max.x {
             std::mem::swap(&mut min.x, &mut max.x);
@@ -44,6 +51,21 @@ where
             max,
             _phantom: PhantomData,
         }
+    }
+    pub fn contains_point(&self, point: &Vector2<S, U>) -> bool {
+        let x = self.min.x <= point.x && self.max.x >= point.x;
+        let y = self.min.y <= point.y && self.max.y >= point.y;
+        x && y
+    }
+    pub fn add_point(&mut self, point: &Vector2<S, U>) {
+        self.min.x = self.min.x.min(point.x);
+        self.min.y = self.min.y.min(point.y);
+        self.max.x = self.max.x.max(point.x);
+        self.max.y = self.max.y.max(point.y);
+    }
+    pub fn union(&mut self, other: &Rect2<S, U>) {
+        self.add_point(&other.min);
+        self.add_point(&other.max);
     }
 
     #[inline]
