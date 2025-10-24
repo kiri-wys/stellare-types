@@ -2,14 +2,16 @@ use std::{marker::PhantomData, ops::Neg};
 
 use stellare_types_derive::{BcArithmetic, BcBitops, CwArithmetic, CwBitops};
 
-use crate::math::{Angle, Decimal, NormalizedVector2, Scalar, Unit, Vector};
+use crate::math::{Angle, Decimal, NormalizedVector2, Radians, Scalar, Unit, Vector};
 
 pub type Vector2u<U> = Vector2<u32, U>;
 pub type Vector2i<U> = Vector2<i32, U>;
 pub type Vector2f<U> = Vector2<f32, U>;
 pub type Vector2d<U> = Vector2<f64, U>;
 
-#[derive(Debug, Default, Clone, Copy, CwArithmetic, CwBitops, BcArithmetic, BcBitops)]
+#[derive(
+    Debug, Default, Clone, Copy, PartialEq, Eq, CwArithmetic, CwBitops, BcArithmetic, BcBitops,
+)]
 pub struct Vector2<S, U = ()>
 where
     S: Scalar,
@@ -31,6 +33,16 @@ where
             y,
             _phantom: PhantomData,
         }
+    }
+}
+
+impl<S, U> Vector2<S, U>
+where
+    S: Scalar,
+    U: Unit,
+{
+    pub fn inner_into<N: Scalar + From<S>>(self) -> Vector2<N, U> {
+        Vector2::new(N::from(self.x), N::from(self.y))
     }
 }
 
@@ -68,6 +80,9 @@ where
         }
     }
 
+    fn cross(self, other: Self) -> S {
+        self.x * other.y - self.y * other.x
+    }
     fn dot(self, other: Self) -> S {
         self.x * other.x + self.y * other.y
     }
@@ -91,6 +106,10 @@ where
     }
     fn distance_to_squared(self, other: Self) -> S {
         (self - other).length_squared()
+    }
+    fn angle(self) -> Radians<S::Decimal> {
+        let p = self.to_precise();
+        Radians(p.y.atan2(p.x))
     }
 
     fn rotate<A>(self, angle: A) -> Self::Precise
@@ -172,6 +191,22 @@ macro_rules! impl_neg_for_signed {
     };
 }
 impl_neg_for_signed!(i8, i16, i32, i64, f32, f64);
+
+impl<S, U> std::fmt::Display for Vector2<S, U>
+where
+    S: Scalar + std::fmt::Display,
+    U: Unit,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "[")?;
+        self.x.fmt(f)?;
+        write!(f, ", ")?;
+        self.y.fmt(f)?;
+        write!(f, "]")?;
+
+        Ok(())
+    }
+}
 
 impl<S, U> From<Vector2<S, U>> for (S, S)
 where
