@@ -1,4 +1,6 @@
 pub mod angles;
+pub mod bezier;
+pub mod line2;
 pub mod rect;
 pub mod transform2;
 pub mod vec2;
