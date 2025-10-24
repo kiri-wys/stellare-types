@@ -1,7 +1,4 @@
-use std::{
-    fmt::{Display, write},
-    ops::Neg,
-};
+use std::{fmt::Display, ops::Neg};
 
 use stellare_types_derive::CwArithmetic;
 
@@ -68,5 +65,25 @@ where
 
     fn neg(self) -> Self::Output {
         Self(-self.0)
+    }
+}
+
+impl<D> Display for Radians<D>
+where
+    D: Display + Decimal,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt(f)?;
+        write!(f, "rad")
+    }
+}
+
+impl<D> Display for Degrees<D>
+where
+    D: Display + Decimal,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt(f)?;
+        write!(f, "deg")
     }
 }
