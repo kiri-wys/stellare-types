@@ -11,11 +11,13 @@ keywords = ["gamedev"]
 [dependencies]
 palette = { version = "0.7.6", optional = true }
 stellare-types-derive = { version = "0.0.4", path = "derive" }
+serde = { version = "1.0.228", features = ["derive"], optional = true }
 
 [features]
 math = []
 color = [ "dep:palette" ]
-default = [ "math", "color"]
+serde = [ "dep:serde" ]
+default = [ "math", "color", "serde" ]
 
 [workspace]
 members = [ "derive" ]

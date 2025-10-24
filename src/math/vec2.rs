@@ -12,6 +12,7 @@ pub type Vector2d<U> = Vector2<f64, U>;
 #[derive(
     Debug, Default, Clone, Copy, PartialEq, Eq, CwArithmetic, CwBitops, BcArithmetic, BcBitops,
 )]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub struct Vector2<S, U = ()>
 where
     S: Scalar,
@@ -20,6 +21,7 @@ where
     pub x: S,
     pub y: S,
     #[op_override("PhantomData")]
+    #[serde(skip)]
     _phantom: PhantomData<U>,
 }
 impl<S, U> Vector2<S, U>

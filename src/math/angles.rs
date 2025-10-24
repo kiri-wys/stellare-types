@@ -1,4 +1,9 @@
-use std::ops::Neg;
+use std::{
+    fmt::{Display, write},
+    ops::Neg,
+};
+
+use stellare_types_derive::CwArithmetic;
 
 use crate::math::Decimal;
 
@@ -10,10 +15,16 @@ where
     fn degrees(self) -> D;
 }
 
-#[derive(Debug, Default, Clone, Copy)]
-pub struct Radians<D: Decimal>(pub D);
-#[derive(Debug, Default, Clone, Copy)]
-pub struct Degrees<D: Decimal>(pub D);
+#[derive(Debug, Default, Clone, Copy, CwArithmetic)]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
+pub struct Radians<D>(pub D)
+where
+    D: Decimal;
+#[derive(Debug, Default, Clone, Copy, CwArithmetic)]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
+pub struct Degrees<D>(pub D)
+where
+    D: Decimal;
 
 impl<D> Angle<D> for Radians<D>
 where

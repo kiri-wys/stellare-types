@@ -10,6 +10,7 @@ pub type Rect2f<U> = Rect2<f32, U>;
 pub type Rect2d<U> = Rect2<f64, U>;
 
 #[derive(Debug, Default, Clone, Copy)]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub struct Rect2<S, U = ()>
 where
     S: Scalar,
