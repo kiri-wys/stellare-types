@@ -4,7 +4,10 @@ pub mod transform2;
 pub mod vec2;
 
 use core::{f32, f64};
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+use std::{
+    fmt::Display,
+    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, Sub, SubAssign},
+};
 
 pub use crate::math::{
     angles::{Angle, Degrees, Radians},
@@ -62,7 +65,7 @@ impl Decimal for f32 {
         !(self.is_nan() || self.is_infinite())
     }
     fn can_div_safe(self) -> bool {
-        !(self.is_number() || self <= 0.0)
+        self.is_number() && self != 0.0
     }
 }
 impl Decimal for f64 {
@@ -99,7 +102,7 @@ impl Decimal for f64 {
         !(self.is_nan() || self.is_infinite())
     }
     fn can_div_safe(self) -> bool {
-        !(self.is_number() || self <= 0.0)
+        self.is_number() && self != 0.0
     }
 }
 
@@ -110,16 +113,20 @@ pub trait Scalar:
     + Sub<Output = Self>
     + Mul<Output = Self>
     + Div<Output = Self>
+    + Rem<Output = Self>
     + AddAssign
     + SubAssign
     + MulAssign
     + DivAssign
     + PartialOrd
+    + Display
 {
     type Decimal: Decimal;
 
     fn zero() -> Self;
     fn one() -> Self;
+    fn min_value() -> Self;
+    fn max_value() -> Self;
     fn splat<V: Vector<Self>>(self) -> V;
 
     fn to_precise(self) -> Self::Decimal;
@@ -149,6 +156,12 @@ impl Scalar for f32 {
     fn one() -> Self {
         1.0
     }
+    fn min_value() -> Self {
+        Self::MIN
+    }
+    fn max_value() -> Self {
+        Self::MAX
+    }
     fn splat<V: Vector<Self>>(self) -> V {
         V::splat(self)
     }
@@ -163,6 +176,12 @@ impl Scalar for f64 {
     }
     fn one() -> Self {
         1.0
+    }
+    fn min_value() -> Self {
+        Self::MIN
+    }
+    fn max_value() -> Self {
+        Self::MAX
     }
     fn splat<V: Vector<Self>>(self) -> V {
         V::splat(self)
@@ -182,6 +201,12 @@ macro_rules! impl_scalar_for_ints {
                 }
                 fn one() -> Self {
                     1
+                }
+                fn min_value() -> Self {
+                    Self::MIN
+                }
+                fn max_value() -> Self {
+                    Self::MAX
                 }
                 fn splat<V: Vector<Self>>(self) -> V {
                     V::splat(self)
@@ -205,6 +230,12 @@ macro_rules! impl_scalar_for_64 {
                 }
                 fn one() -> Self {
                     1
+                }
+                fn min_value() -> Self {
+                    Self::MIN
+                }
+                fn max_value() -> Self {
+                    Self::MAX
                 }
                 fn splat<V: Vector<Self>>(self) -> V {
                     V::splat(self)
@@ -245,12 +276,14 @@ where
 
     fn to_precise(self) -> Self::Precise;
 
+    fn cross(self, other: Self) -> S;
     fn dot(self, other: Self) -> S;
     fn length_squared(self) -> S;
     fn length(self) -> S::Decimal;
     fn normalize(self) -> Self::Normalized;
     fn distance_to(self, other: Self) -> S::Decimal;
     fn distance_to_squared(self, other: Self) -> S;
+    fn angle(self) -> Radians<S::Decimal>;
 
     fn rotate<A: Angle<S::Decimal>>(self, angle: A) -> Self::Precise;
     fn lerp(self, max: Self, alpha: S::Decimal) -> Self::Precise;
@@ -275,6 +308,7 @@ where
 }
 
 #[repr(transparent)]
+#[derive(Debug)]
 pub struct NormalizedVector2<D, U = ()>
 where
     D: Decimal + Scalar,
