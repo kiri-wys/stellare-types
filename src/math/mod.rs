@@ -11,6 +11,7 @@ use std::{
     ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, Sub, SubAssign},
 };
 
+use crate::define_spaces;
 pub use crate::math::{
     angles::{Angle, Degrees, Radians},
     rect::{Rect2, Rect2d, Rect2f, Rect2i, Rect2u},
@@ -254,16 +255,14 @@ impl_scalar_for_64!(i64, u64);
 pub trait Unit: Clone + Copy {}
 impl Unit for () {}
 
-macro_rules! define_spaces {
-    ($($name:ident),* $(,)?) => {
-        $(
-            #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
-            pub struct $name;
-            impl Unit for $name {}
-        )*
-    };
-}
-define_spaces!(WorldSpace, ViewSpace, ClipSpace, TexelSpace, ScreenSpace);
+define_spaces!(
+    Unit,
+    WorldSpace,
+    ViewSpace,
+    ClipSpace,
+    TexelSpace,
+    ScreenSpace
+);
 
 pub trait Vector<S>
 where

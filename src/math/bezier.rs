@@ -16,7 +16,7 @@ where
     D: Decimal,
 {
     pub fn point_at(&self, t: D) -> Vector2<D, ()> {
-        // TODO: Computed 3 might not be the exact same as 3, account for that?
+        // TODO: Computed 3 might not be the exact same as literal 3, account for that?
         let three = D::one() + D::one() + D::one();
         let u = D::one() - t;
         let uu = u * u;
