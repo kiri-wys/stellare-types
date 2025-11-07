@@ -1,6 +1,6 @@
-use crate::math::{Scalar, Unit, Vector2};
+use crate::math::{Integer, Unit, Vector2};
 
-pub struct Line2<S, U>(Vector2<S, U>, Vector2<S, U>)
+pub struct Line2<I, U>(Vector2<I, U>, Vector2<I, U>)
 where
-    S: Scalar,
+    I: Integer,
     U: Unit;

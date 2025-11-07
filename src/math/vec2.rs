@@ -2,7 +2,7 @@ use std::{marker::PhantomData, ops::Neg};
 
 use stellare_types_derive::{BcArithmetic, BcBitops, CwArithmetic, CwBitops};
 
-use crate::math::{Angle, Decimal, NormalizedVector2, Radians, Scalar, Unit, Vector};
+use crate::math::{Angle, Decimal, Integer, NormalizedVector2, Radians, Unit, Vector};
 
 pub type Vector2u<U> = Vector2<u32, U>;
 pub type Vector2i<U> = Vector2<i32, U>;
@@ -13,64 +13,58 @@ pub type Vector2d<U> = Vector2<f64, U>;
     Debug, Default, Clone, Copy, PartialEq, Eq, CwArithmetic, CwBitops, BcArithmetic, BcBitops,
 )]
 #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
-pub struct Vector2<S, U = ()>
+pub struct Vector2<I, U = ()>
 where
-    S: Scalar,
+    I: Integer,
     U: Unit,
 {
-    pub x: S,
-    pub y: S,
+    pub x: I,
+    pub y: I,
     #[op_override("PhantomData")]
     #[serde(skip)]
     _phantom: PhantomData<U>,
 }
-impl<S, U> Vector2<S, U>
+impl<I, U> Vector2<I, U>
 where
-    S: Scalar,
+    I: Integer,
     U: Unit,
 {
-    pub fn new(x: S, y: S) -> Vector2<S, U> {
+    pub fn new(x: I, y: I) -> Vector2<I, U> {
         Vector2 {
             x,
             y,
             _phantom: PhantomData,
         }
     }
-}
 
-impl<S, U> Vector2<S, U>
-where
-    S: Scalar,
-    U: Unit,
-{
-    pub fn inner_into<N: Scalar + From<S>>(self) -> Vector2<N, U> {
+    pub fn inner_into<N: Integer + From<I>>(self) -> Vector2<N, U> {
         Vector2::new(N::from(self.x), N::from(self.y))
     }
 }
 
-impl<S, U> Vector<S> for Vector2<S, U>
+impl<I, U> Vector<I> for Vector2<I, U>
 where
-    S: Scalar,
+    I: Integer,
     U: Unit,
 {
-    type Precise = Vector2<S::Decimal, U>;
-    type Normalized = Option<NormalizedVector2<S::Decimal, U>>;
+    type Precise = Vector2<I::Decimal, U>;
+    type Normalized = Option<NormalizedVector2<I::Decimal, U>>;
 
     fn zero() -> Self {
         Self {
-            x: S::zero(),
-            y: S::zero(),
+            x: I::zero(),
+            y: I::zero(),
             _phantom: PhantomData,
         }
     }
     fn one() -> Self {
         Self {
-            x: S::one(),
-            y: S::one(),
+            x: I::one(),
+            y: I::one(),
             _phantom: PhantomData,
         }
     }
-    fn splat(val: S) -> Self {
+    fn splat(val: I) -> Self {
         Self::new(val, val)
     }
 
@@ -82,16 +76,16 @@ where
         }
     }
 
-    fn cross(self, other: Self) -> S {
+    fn cross(self, other: Self) -> I {
         self.x * other.y - self.y * other.x
     }
-    fn dot(self, other: Self) -> S {
+    fn dot(self, other: Self) -> I {
         self.x * other.x + self.y * other.y
     }
-    fn length_squared(self) -> S {
+    fn length_squared(self) -> I {
         self.x * self.x + self.y * self.y
     }
-    fn length(self) -> S::Decimal {
+    fn length(self) -> I::Decimal {
         self.length_squared().to_precise().sqrt()
     }
     fn normalize(self) -> Self::Normalized {
@@ -103,20 +97,20 @@ where
         }
         Some(NormalizedVector2 { data: (p / l) })
     }
-    fn distance_to(self, other: Self) -> S::Decimal {
+    fn distance_to(self, other: Self) -> I::Decimal {
         (self - other).length()
     }
-    fn distance_to_squared(self, other: Self) -> S {
+    fn distance_to_squared(self, other: Self) -> I {
         (self - other).length_squared()
     }
-    fn angle(self) -> Radians<S::Decimal> {
+    fn angle(self) -> Radians<I::Decimal> {
         let p = self.to_precise();
         Radians(p.y.atan2(p.x))
     }
 
     fn rotate<A>(self, angle: A) -> Self::Precise
     where
-        A: Angle<S::Decimal>,
+        A: Angle<I::Decimal>,
     {
         let rads = angle.radians();
         let p = self.to_precise();
@@ -126,12 +120,12 @@ where
             _phantom: PhantomData,
         }
     }
-    fn lerp(self, max: Self, alpha: S::Decimal) -> Self::Precise {
+    fn lerp(self, max: Self, alpha: I::Decimal) -> Self::Precise {
         let p_min = self.to_precise();
         let p_max = max.to_precise();
         Vector2 {
-            x: p_min.x * (S::Decimal::one() - alpha) + p_max.x * alpha,
-            y: p_min.y * (S::Decimal::one() - alpha) + p_max.y * alpha,
+            x: p_min.x * (I::Decimal::one() - alpha) + p_max.x * alpha,
+            y: p_min.y * (I::Decimal::one() - alpha) + p_max.y * alpha,
             _phantom: PhantomData,
         }
     }
@@ -156,14 +150,14 @@ where
             _phantom: PhantomData,
         }
     }
-    fn min_component(self) -> (usize, S) {
+    fn min_component(self) -> (usize, I) {
         if self.x <= self.y {
             (0, self.x)
         } else {
             (1, self.y)
         }
     }
-    fn max_component(self) -> (usize, S) {
+    fn max_component(self) -> (usize, I) {
         if self.x >= self.y {
             (0, self.x)
         } else {
@@ -196,7 +190,7 @@ impl_neg_for_signed!(i8, i16, i32, i64, f32, f64);
 
 impl<S, U> std::fmt::Display for Vector2<S, U>
 where
-    S: Scalar + std::fmt::Display,
+    S: Integer + std::fmt::Display,
     U: Unit,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -210,22 +204,22 @@ where
     }
 }
 
-impl<S, U> From<Vector2<S, U>> for (S, S)
+impl<I, U> From<Vector2<I, U>> for (I, I)
 where
-    S: Scalar,
+    I: Integer,
     U: Unit,
 {
-    fn from(value: Vector2<S, U>) -> Self {
+    fn from(value: Vector2<I, U>) -> Self {
         (value.x, value.y)
     }
 }
 
-impl<S, U> From<(S, S)> for Vector2<S, U>
+impl<I, U> From<(I, I)> for Vector2<I, U>
 where
-    S: Scalar,
+    I: Integer,
     U: Unit,
 {
-    fn from(value: (S, S)) -> Self {
+    fn from(value: (I, I)) -> Self {
         Vector2::new(value.0, value.1)
     }
 }

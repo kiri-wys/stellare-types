@@ -19,7 +19,7 @@ pub use crate::math::{
     vec2::{Vector2, Vector2d, Vector2f, Vector2i, Vector2u},
 };
 
-pub trait Decimal: Clone + Copy + Scalar<Decimal = Self> + Neg<Output = Self> {
+pub trait Decimal: Clone + Copy + Integer<Decimal = Self> + Neg<Output = Self> {
     fn pi() -> Self;
     fn tau() -> Self;
     fn to_radians(self) -> Self;
@@ -109,7 +109,7 @@ impl Decimal for f64 {
     }
 }
 
-pub trait Scalar:
+pub trait Integer:
     Clone
     + Copy
     + Add<Output = Self>
@@ -151,7 +151,7 @@ pub trait Scalar:
     }
 }
 
-impl Scalar for f32 {
+impl Integer for f32 {
     type Decimal = Self;
     fn zero() -> Self {
         0.0
@@ -172,7 +172,7 @@ impl Scalar for f32 {
         self
     }
 }
-impl Scalar for f64 {
+impl Integer for f64 {
     type Decimal = Self;
     fn zero() -> Self {
         0.0
@@ -194,10 +194,10 @@ impl Scalar for f64 {
     }
 }
 
-macro_rules! impl_scalar_for_ints {
+macro_rules! impl_integer_for_ints {
     ($($t:ty),*) => {
         $(
-            impl Scalar for $t {
+            impl Integer for $t {
                 type Decimal = f32;
                 fn zero() -> Self {
                     0
@@ -222,11 +222,11 @@ macro_rules! impl_scalar_for_ints {
     };
 }
 
-impl_scalar_for_ints!(u8, i8, u16, i16, u32, i32);
-macro_rules! impl_scalar_for_64 {
+impl_integer_for_ints!(u8, i8, u16, i16, u32, i32);
+macro_rules! impl_integer_for_64 {
     ($($t:ty),*) => {
         $(
-            impl Scalar for $t {
+            impl Integer for $t {
                 type Decimal = f64;
                 fn zero() -> Self {
                     0
@@ -250,7 +250,7 @@ macro_rules! impl_scalar_for_64 {
         )*
     };
 }
-impl_scalar_for_64!(i64, u64);
+impl_integer_for_64!(i64, u64);
 
 pub trait Unit: Clone + Copy {}
 impl Unit for () {}
@@ -264,43 +264,43 @@ define_spaces!(
     ScreenSpace
 );
 
-pub trait Vector<S>
+pub trait Vector<I>
 where
-    S: Scalar,
+    I: Integer,
 {
     type Precise;
     type Normalized;
 
     fn zero() -> Self;
     fn one() -> Self;
-    fn splat(val: S) -> Self;
+    fn splat(val: I) -> Self;
 
     fn to_precise(self) -> Self::Precise;
 
-    fn cross(self, other: Self) -> S;
-    fn dot(self, other: Self) -> S;
-    fn length_squared(self) -> S;
-    fn length(self) -> S::Decimal;
+    fn cross(self, other: Self) -> I;
+    fn dot(self, other: Self) -> I;
+    fn length_squared(self) -> I;
+    fn length(self) -> I::Decimal;
     fn normalize(self) -> Self::Normalized;
-    fn distance_to(self, other: Self) -> S::Decimal;
-    fn distance_to_squared(self, other: Self) -> S;
-    fn angle(self) -> Radians<S::Decimal>;
+    fn distance_to(self, other: Self) -> I::Decimal;
+    fn distance_to_squared(self, other: Self) -> I;
+    fn angle(self) -> Radians<I::Decimal>;
 
-    fn rotate<A: Angle<S::Decimal>>(self, angle: A) -> Self::Precise;
-    fn lerp(self, max: Self, alpha: S::Decimal) -> Self::Precise;
+    fn rotate<A: Angle<I::Decimal>>(self, angle: A) -> Self::Precise;
+    fn lerp(self, max: Self, alpha: I::Decimal) -> Self::Precise;
     fn min(self, other: Self) -> Self;
     fn max(self, other: Self) -> Self;
     fn clamp(self, min: Self, max: Self) -> Self;
-    fn min_component(self) -> (usize, S);
-    fn max_component(self) -> (usize, S);
+    fn min_component(self) -> (usize, I);
+    fn max_component(self) -> (usize, I);
 
-    fn magnitude_squared(self) -> S
+    fn magnitude_squared(self) -> I
     where
         Self: Sized,
     {
         self.length_squared()
     }
-    fn magnitude(self) -> S::Decimal
+    fn magnitude(self) -> I::Decimal
     where
         Self: Sized,
     {
@@ -312,7 +312,7 @@ where
 #[derive(Debug)]
 pub struct NormalizedVector2<D, U = ()>
 where
-    D: Decimal + Scalar,
+    D: Decimal,
     U: Unit,
 {
     data: Vector2<D, U>,

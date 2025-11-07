@@ -39,7 +39,7 @@ fn bc_ops(input: TokenStream, ops: &[&str]) -> TokenStream {
             if let WherePredicate::Type(ty) = w {
                 let has_scalar = ty.bounds.iter().find_map(|b| {
                     if let TypeParamBound::Trait(t) = b {
-                        t.path.segments.last().map(|e| e.ident == "Scalar")
+                        t.path.segments.last().map(|e| e.ident == "Integer")
                     } else {
                         None
                     }
@@ -61,7 +61,7 @@ fn bc_ops(input: TokenStream, ops: &[&str]) -> TokenStream {
             if let WherePredicate::Type(ty) = w {
                 let has_scalar = ty.bounds.iter().find_map(|b| {
                     if let TypeParamBound::Trait(t) = b {
-                        t.path.segments.last().map(|e| e.ident == "Scalar")
+                        t.path.segments.last().map(|e| e.ident == "Integer")
                     } else {
                         None
                     }
@@ -122,7 +122,7 @@ fn cw_ops(input: TokenStream, ops: &[&str]) -> TokenStream {
             if let WherePredicate::Type(ty) = w {
                 let has_scalar = ty.bounds.iter().find_map(|b| {
                     if let TypeParamBound::Trait(t) = b {
-                        t.path.segments.last().map(|e| e.ident == "Scalar")
+                        t.path.segments.last().map(|e| e.ident == "Integer")
                     } else {
                         None
                     }
@@ -143,7 +143,7 @@ fn cw_ops(input: TokenStream, ops: &[&str]) -> TokenStream {
             if let WherePredicate::Type(ty) = w {
                 let has_scalar = ty.bounds.iter().find_map(|b| {
                     if let TypeParamBound::Trait(t) = b {
-                        t.path.segments.last().map(|e| e.ident == "Scalar")
+                        t.path.segments.last().map(|e| e.ident == "Integer")
                     } else {
                         None
                     }

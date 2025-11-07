@@ -1,4 +1,4 @@
-use crate::math::{Decimal, Scalar, Vector, Vector2};
+use crate::math::{Decimal, Integer, Vector, Vector2};
 
 #[derive(Debug, Clone, Copy, Default)]
 pub struct CubicBezier<D>
@@ -48,7 +48,7 @@ where
 
     pub fn arc_lenght_by_simpsons<S>(&self, t: D, steps: S) -> D
     where
-        S: Scalar<Decimal = D>,
+        S: Integer<Decimal = D>,
     {
         let stwo = S::one() + S::one();
         let two = D::one() + D::one();
@@ -76,7 +76,7 @@ where
 
     pub fn find_t_for_length<S>(&self, length: D, steps: S, tolerance: D) -> D
     where
-        S: Scalar<Decimal = D>,
+        S: Integer<Decimal = D>,
     {
         let total_length = self.arc_lenght_by_simpsons(D::one(), steps);
         let target = length.clamp(D::zero(), total_length);
